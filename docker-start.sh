@@ -11,6 +11,11 @@ elif [[ ${harvester} == 'true' ]]; then
     chia configure --set-farmer-peer "${farmer_address}:${farmer_port}"
     chia start harvester
   fi
+elif [[ ${all} == 'true' ]]; then
+  chia start all
+elif [[ ${wallet} == 'true' ]]; then
+  cd chia-blockchain-gui
+  npm run electron
 else
   chia start farmer
 fi

@@ -1,0 +1,64 @@
+version: "3.9"
+services:
+  testnet:
+    build:
+      context: .
+      args:
+        BRANCH: protocol_and_cats_rebased
+        TZ: US/Eastern
+    image: dishwasha/chia-blockchain
+    environment:
+      CHIA_ROOT: /home/docker/.chia/testnet
+      GENESIS_CHALLENGE: ae56976ad6594b1b439270d202dfa42471ee7f645361905e0b03ad4286f61023
+      NODE: testnet
+      TZ: US/Eastern
+      keys: generate # change to persistent after first run
+      all: true
+      log_level: INFO
+      log_to_file: false
+      testnet: true
+      local: true
+    expose:
+      - "514"
+      - "8000"
+      - "8222"
+      - "8444"
+      - "8446"
+      - "8447"
+      - "8448"
+      - "8449"
+      - "8555"
+      - "8559"
+      - "8560"
+      - "9257"
+      - "55401"
+      - "58444"
+    hostname: testnet
+    user: 1000:100
+    volumes:
+      - plots:/plots
+      - ${PWD}/testnet:/home/docker/.chia/testnet
+  testwallet:
+    image: dishwasha/chia-blockchain
+    depends_on:
+      - testnet
+    environment:
+      CHIA_ROOT: /home/docker/.chia/testnet
+      # For WSL2 see https://medium.com/@japheth.yates/the-complete-wsl2-gui-setup-2582828f4577
+      DISPLAY: $DISPLAY
+      GENESIS_CHALLENGE: ae56976ad6594b1b439270d202dfa42471ee7f645361905e0b03ad4286f61023
+      NODE: testnet
+      VIRTUAL_ENV: /home/docker/chia-blockchain/venv
+      keys: /home/docker/ssl
+      testnet: true
+      local: true
+      wallet: true
+    user: 1000:100
+    volumes:
+      - plots:/plots
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${PWD}/testwallet:/home/docker/.chia/testnet
+      - ${PWD}/testnet/config/ssl:/home/docker/ssl
+    working_dir: /home/docker/chia-blockchain/chia-blockchain-gui
+volumes:
+  plots:
